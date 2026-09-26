@@ -45,7 +45,8 @@
     "test": "npm run build && vitest run",
     "test:coverage": "npm run build && vitest run --coverage",
     "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "panel": "node scripts/control-panel.mjs"
   },
   "dependencies": {
     "@chrischall/mcp-utils": "^2.6.0",
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@modelcontextprotocol/client": "^2.0.0",
+    "@ngrok/ngrok": "^1.7.0",
     "@types/node": "^26.0.0",
     "@vitest/coverage-v8": "^5.0.0",
     "esbuild": "^0.28.0",

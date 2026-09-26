@@ -279,44 +279,38 @@ Anyone holding the secret has full access to the account. Treat the secret URL l
 
 ### Control panel
 
-`python scripts/control_panel.py` (on Windows, `py scripts\control_panel.py`) opens a small Tk window that does the above for you:
+`npm run panel` opens a small control page in your browser and does the above for you:
 
-- starts the server and ngrok, reusing a running ngrok tunnel so the URL stays the same
+- starts the server, and an ngrok tunnel through the `@ngrok/ngrok` package, so you don't need the ngrok CLI
 - shows the full `https://…/mcp/<secret>` URL, with a Copy button
-- edits the Skylight email and password, and saves them to `.env`
+- edits the Skylight email, password and ngrok authtoken, and saves them to `.env`
 - **Test** checks the entered login against Skylight without saving it
 - **Restart server** reloads `.env`
 
-The panel generates `MCP_HTTP_SECRET` into `.env` if it is missing. Server output goes to `server.log`. Closing the window stops the server and any ngrok process the panel started. It needs Python with Tk (the python.org installer includes it), `npm run build` first, and `node` and `ngrok` on `PATH` with an ngrok authtoken configured.
+The panel generates `MCP_HTTP_SECRET` into `.env` if it is missing. Set `NGROK_DOMAIN` in `.env` to use a specific reserved domain. Server output goes to `server.log`. Press Ctrl+C in the terminal to stop everything.
+
+The page listens only on `127.0.0.1`, and its URL carries a random token that changes on each launch. Other websites and other users of the machine cannot reach it. Run `npm run build` before the first launch.
 
 #### Windows setup
 
-Install the dependencies with winget, then open a **new** terminal so `PATH` picks them up:
+Install Git and Node.js with winget, then open a **new** terminal so `PATH` picks them up:
 
 ```
 winget install -e --id Git.Git
 winget install -e --id OpenJS.NodeJS.LTS
-winget install -e --id Python.Python.3.13
-winget install -e --id Ngrok.Ngrok
 ```
 
-Connect ngrok to your account. Sign up at [ngrok.com](https://ngrok.com), copy your authtoken from the [dashboard](https://dashboard.ngrok.com/get-started/your-authtoken), then run:
-
-```
-ngrok config add-authtoken <your-authtoken>
-```
-
-Clone, build and start the panel:
+Sign up at [ngrok.com](https://ngrok.com) and copy your authtoken from the [dashboard](https://dashboard.ngrok.com/get-started/your-authtoken). Then clone, build and start the panel:
 
 ```
 git clone https://github.com/cseelhoff/skylight-mcp
 cd skylight-mcp
 npm install
 npm run build
-py scripts\control_panel.py
+npm run panel
 ```
 
-Enter your Skylight email and password, click **Test**, then **Save** and **Restart server**. Copy the URL into your MCP client.
+Enter your Skylight email and password and your ngrok authtoken, click **Test**, then **Save** and **Restart server**. Copy the URL into your MCP client.
 
 If PowerShell refuses to run `npm` ("running scripts is disabled on this system"), use Command Prompt instead, or type `npm.cmd`.
 
