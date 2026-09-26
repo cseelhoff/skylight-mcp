@@ -289,6 +289,37 @@ Anyone holding the secret has full access to the account. Treat the secret URL l
 
 The panel generates `MCP_HTTP_SECRET` into `.env` if it is missing. Server output goes to `server.log`. Closing the window stops the server and any ngrok process the panel started. It needs Python with Tk (the python.org installer includes it), `npm run build` first, and `node` and `ngrok` on `PATH` with an ngrok authtoken configured.
 
+#### Windows setup
+
+Install the dependencies with winget, then open a **new** terminal so `PATH` picks them up:
+
+```
+winget install -e --id Git.Git
+winget install -e --id OpenJS.NodeJS.LTS
+winget install -e --id Python.Python.3.13
+winget install -e --id Ngrok.Ngrok
+```
+
+Connect ngrok to your account. Sign up at [ngrok.com](https://ngrok.com), copy your authtoken from the [dashboard](https://dashboard.ngrok.com/get-started/your-authtoken), then run:
+
+```
+ngrok config add-authtoken <your-authtoken>
+```
+
+Clone, build and start the panel:
+
+```
+git clone https://github.com/cseelhoff/skylight-mcp
+cd skylight-mcp
+npm install
+npm run build
+py scripts\control_panel.py
+```
+
+Enter your Skylight email and password, click **Test**, then **Save** and **Restart server**. Copy the URL into your MCP client.
+
+If PowerShell refuses to run `npm` ("running scripts is disabled on this system"), use Command Prompt instead, or type `npm.cmd`.
+
 ## Local dev
 
 ```
