@@ -49,9 +49,16 @@ function secretMatches(candidate: string, secret: string): boolean {
   return timingSafeEqual(digest(candidate), digest(secret));
 }
 
+// Only MCP paths answer 401: a 401 carrying WWW-Authenticate on OAuth discovery
+// paths (/.well-known/…) makes clients such as Grok start an OAuth flow this
+// server does not offer.
 export function requireSecret(handler: FetchLikeMcpHandler, secret: string): FetchLikeMcpHandler {
   return {
     fetch: async (request, options) => {
+      const { pathname } = new URL(request.url);
+      if (pathname !== MCP_PATH && !pathname.startsWith(`${MCP_PATH}/`)) {
+        return new Response('Not Found', { status: 404 });
+      }
       const candidate = presentedSecret(request);
       if (candidate === undefined || !secretMatches(candidate, secret)) {
         return new Response('Unauthorized', { status: 401, headers: { 'WWW-Authenticate': 'Bearer' } });

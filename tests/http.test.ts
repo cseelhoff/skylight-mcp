@@ -62,7 +62,6 @@ describe('requireSecret', () => {
     ['no credential', '/mcp', {}],
     ['a wrong bearer token', '/mcp', { Authorization: 'Bearer nope' }],
     ['a wrong path secret', '/mcp/nope', {}],
-    ['an unknown path', '/', { Authorization: `Bearer ${SECRET}` }],
   ])('answers 401 for %s without reaching the MCP handler', async (_label, path, headers) => {
     inner.fetch.mockClear();
     const response = await guarded.fetch(new Request(`http://x${path}`, { headers }));
@@ -70,6 +69,17 @@ describe('requireSecret', () => {
     expect(response.headers.get('WWW-Authenticate')).toBe('Bearer');
     expect(inner.fetch).not.toHaveBeenCalled();
   });
+
+  it.each(['/', '/mcpx', '/.well-known/oauth-protected-resource', '/.well-known/oauth-authorization-server', '/register'])(
+    'answers 404 without WWW-Authenticate for non-MCP path %s, so clients do not start OAuth',
+    async (path) => {
+      inner.fetch.mockClear();
+      const response = await guarded.fetch(new Request(`http://x${path}`, { headers: { Authorization: `Bearer ${SECRET}` } }));
+      expect(response.status).toBe(404);
+      expect(response.headers.has('WWW-Authenticate')).toBe(false);
+      expect(inner.fetch).not.toHaveBeenCalled();
+    },
+  );
 
   it('passes a matching secret through', async () => {
     const response = await guarded.fetch(new Request(`http://x/mcp/${SECRET}`));
