@@ -277,6 +277,18 @@ ngrok http 3000
 
 Anyone holding the secret has full access to the account. Treat the secret URL like a password, and rotate the secret if it leaks. The confirmation gates described below still apply.
 
+### Control panel
+
+`python scripts/control_panel.py` (on Windows, `py scripts\control_panel.py`) opens a small Tk window that does the above for you:
+
+- starts the server and ngrok, reusing a running ngrok tunnel so the URL stays the same
+- shows the full `https://…/mcp/<secret>` URL, with a Copy button
+- edits the Skylight email and password, and saves them to `.env`
+- **Test** checks the entered login against Skylight without saving it
+- **Restart server** reloads `.env`
+
+The panel generates `MCP_HTTP_SECRET` into `.env` if it is missing. Server output goes to `server.log`. Closing the window stops the server and any ngrok process the panel started. It needs Python with Tk (the python.org installer includes it), `npm run build` first, and `node` and `ngrok` on `PATH` with an ngrok authtoken configured.
+
 ## Local dev
 
 ```
