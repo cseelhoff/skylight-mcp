@@ -12,7 +12,7 @@ Every API request carries the `skylight-api-version: 2026-05-01` header (matchin
 
 The server uses the official TypeScript SDK v2 and supports the stateless `2026-07-28` protocol revision over stdio. Clients can discover and call tools without an initialization handshake. Existing clients can still use the `2025-11-25` handshake.
 
-The transport remains stdio. A host can expose it over authenticated HTTP. This package does not open a network listener.
+The default transport is stdio, which opens no network listener. Passing `--http` serves Streamable HTTP instead, for remote clients. See [Remote HTTP](#remote-http).
 
 ## Auth
 
@@ -260,6 +260,22 @@ the login pair that cost is one login. With only `SKYLIGHT_REFRESH_TOKEN` it is
 a lockout, because the rotated token was never saved: the server says so loudly
 on stderr, and warns at startup if `SKYLIGHT_TOKEN_CACHE=false` is set without
 a login pair.
+
+## Remote HTTP
+
+`node dist/bundle.js --http` serves MCP at `http://127.0.0.1:3000/mcp`. Every request must carry the shared secret from `MCP_HTTP_SECRET`, in one of two forms:
+
+- `Authorization: Bearer <secret>` on `/mcp`
+- the secret URL `/mcp/<secret>`, for clients that accept only a URL
+
+Anything else gets a 401. The secret must be at least 32 URL-safe characters (`openssl rand -hex 32`). `MCP_HTTP_PORT` and `MCP_HTTP_HOST` override the port and bind address. The server binds to localhost by default, so put a TLS tunnel or reverse proxy in front of it to publish it:
+
+```
+MCP_HTTP_SECRET=$(openssl rand -hex 32) node --env-file=.env dist/bundle.js --http
+ngrok http 3000
+```
+
+Anyone holding the secret has full access to the account. Treat the secret URL like a password, and rotate the secret if it leaks. The confirmation gates described below still apply.
 
 ## Local dev
 
